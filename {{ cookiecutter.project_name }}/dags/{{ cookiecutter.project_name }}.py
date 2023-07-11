@@ -1,6 +1,7 @@
 from airflow import DAG
 from conveyor.factories import ConveyorDbtTaskFactory
 from conveyor.secrets import AWSParameterStoreValue
+from {{ cookiecutter.project_name }}.alerting import slack_failed_dag_notification
 from datetime import datetime, timedelta
 
 
@@ -17,7 +18,7 @@ default_args = {
 
 
 dag = DAG(
-    "{{ cookiecutter.project_name }}", default_args=default_args, schedule_interval="@daily", max_active_runs=1
+    "{{ cookiecutter.project_name }}", default_args=default_args, schedule_interval="@daily", max_active_runs=1, on_failure_callback=slack_failed_dag_notification
 )
 factory = ConveyorDbtTaskFactory(task_aws_role="conveyor-samples",
                                  task_arguments=["--no-use-colors", "{command}", "--profiles-dir", ".", "--select", "{model}",],
